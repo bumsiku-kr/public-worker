@@ -220,8 +220,23 @@ The `/sitemap` endpoint returns all post slugs for SEO tools:
 
 Use this to generate XML sitemaps or feed SEO indexing systems.
 
+## GitHub Actions Deployment
+
+This repository includes automatic deployment via GitHub Actions:
+
+- Push to `main` branch triggers automatic deployment to production
+- Manual deployment available via GitHub Actions tab
+- Requires secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+
+## Related Repositories
+
+- [blog-admin-worker](../blog-admin-worker) - Admin API Worker
+- [blog-migration](../blog-migration) - Database schema and migrations
+- [blog-frontend](../blog-frontend) - Next.js frontend
+- [blog-backend](../blog-backend) - Backend services
+
 ## Resources
 
-- [Implementation Plan](../IMPLEMENTATION_PLAN.md) - Complete specification
-- [Setup Guide](../SETUP_GUIDE.md) - Setup instructions
 - [CloudFlare Workers Docs](https://developers.cloudflare.com/workers/)
+- [CloudFlare D1 Docs](https://developers.cloudflare.com/d1/)
+- [CloudFlare KV Docs](https://developers.cloudflare.com/kv/)
