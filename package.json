@@ -7,6 +7,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "build": "esbuild src/index.js --bundle --format=esm --outfile=dist/index.js --platform=browser --conditions=workerd,worker",
+    "build:check": "esbuild src/index.js --bundle --format=esm --outfile=/dev/null --platform=browser --conditions=workerd,worker",
     "lint": "eslint src/**/*.js",
     "format": "prettier --write src/**/*.js",
     "test": "vitest",
