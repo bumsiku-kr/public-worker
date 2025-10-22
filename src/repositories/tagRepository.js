@@ -1,13 +1,3 @@
-/**
- * Tag Repository - Persistence Layer
- * Handles all database operations for tags
- * Single Responsibility: Data access only, no business logic
- */
-
-/**
- * Tag Repository
- * Encapsulates all database operations for tags
- */
 export class TagRepository {
   constructor(db) {
     this.db = db;

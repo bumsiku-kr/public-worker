@@ -1,12 +1,5 @@
-/**
- * Public Worker Router
- * URL routing logic for public API endpoints
- */
-
 import { errorResponse } from "./utils/response.js";
 import { convertError } from "./utils/errors.js";
-
-// Import all handlers
 import {
   handleGetPosts,
   handleGetPostBySlug,
@@ -16,25 +9,13 @@ import { handleGetComments, handleCreateComment } from "./handlers/comments.js";
 import { handleGetTags } from "./handlers/tags.js";
 import { handleGetSitemap } from "./handlers/sitemap.js";
 
-/**
- * Route configuration
- * Pattern format: "METHOD /path/pattern"
- * Path parameters: :paramName
- */
 const routes = [
-  // Public post endpoints
   { pattern: "GET /posts", handler: handleGetPosts },
   { pattern: "GET /posts/:slug", handler: handleGetPostBySlug },
   { pattern: "PATCH /posts/:postId/views", handler: handleIncrementViews },
-
-  // Public comment endpoints
   { pattern: "GET /comments/:postId", handler: handleGetComments },
   { pattern: "POST /comments/:postId", handler: handleCreateComment },
-
-  // Public tag endpoints
   { pattern: "GET /tags", handler: handleGetTags },
-
-  // Public sitemap endpoint
   { pattern: "GET /sitemap", handler: handleGetSitemap },
 ];
 
@@ -48,7 +29,6 @@ function matchPattern(pattern, path) {
   const patternParts = pattern.split("/").filter(Boolean);
   const pathParts = path.split("/").filter(Boolean);
 
-  // Must have same number of parts
   if (patternParts.length !== pathParts.length) {
     return null;
   }
@@ -59,13 +39,10 @@ function matchPattern(pattern, path) {
     const patternPart = patternParts[i];
     const pathPart = pathParts[i];
 
-    // Parameter (starts with :)
     if (patternPart.startsWith(":")) {
       const paramName = patternPart.substring(1);
       params[paramName] = decodeURIComponent(pathPart);
-    }
-    // Literal match
-    else if (patternPart !== pathPart) {
+    } else if (patternPart !== pathPart) {
       return null;
     }
   }
@@ -83,12 +60,10 @@ function findRoute(method, pathname) {
   for (const route of routes) {
     const [routeMethod, routePattern] = route.pattern.split(" ", 2);
 
-    // Method must match
     if (routeMethod !== method) {
       continue;
     }
 
-    // Try to match pattern
     const match = matchPattern(routePattern, pathname);
     if (match) {
       return {
@@ -141,29 +116,23 @@ export async function router(request, env, ctx) {
     const { pathname } = url;
     const method = request.method;
 
-    // Find matching route
     const match = findRoute(method, pathname);
 
     if (!match) {
       return errorResponse("Not Found", 404);
     }
 
-    // Parse request body for POST/PUT/PATCH
     let body = null;
     if (["POST", "PUT", "PATCH"].includes(method)) {
       body = await parseJsonBody(request);
     }
 
-    // Extract query parameters
     const query = getQueryParams(url);
 
-    // Call handler with parameters
-    // Handler signature: handler(request, env, ctx, params, user)
     return await match.handler(request, env, ctx, match.params, null);
   } catch (error) {
     console.error("Router error:", error);
 
-    // Convert to API error
     const apiError = convertError(error);
     return errorResponse(apiError.message, apiError.status);
   }

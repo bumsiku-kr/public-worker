@@ -1,13 +1,3 @@
-/**
- * Sitemap Service - Application Layer
- * Handles business logic for sitemap generation
- * Single Responsibility: Business rules for SEO sitemap
- */
-
-/**
- * Sitemap Service
- * Implements business logic for sitemap operations
- */
 export class SitemapService {
   constructor(tagRepository) {
     this.tagRepository = tagRepository;
@@ -18,7 +8,6 @@ export class SitemapService {
    * @returns {Promise<Array<string>>} Array of post slugs for SEO
    */
   async generateSitemap() {
-    // Fetch all published post slugs
     const slugs = await this.tagRepository.findAllPublishedSlugs();
     return slugs;
   }

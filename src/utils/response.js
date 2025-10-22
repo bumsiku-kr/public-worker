@@ -1,9 +1,4 @@
 /**
- * Response Utilities
- * Standard response formatting and CORS handling
- */
-
-/**
  * Create a JSON response with standard headers
  * @param {Object} data - Response data
  * @param {number} status - HTTP status code

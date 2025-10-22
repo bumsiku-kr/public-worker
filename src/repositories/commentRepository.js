@@ -1,13 +1,3 @@
-/**
- * Comment Repository - Persistence Layer
- * Handles all database operations for comments
- * Single Responsibility: Data access only, no business logic
- */
-
-/**
- * Comment Repository
- * Encapsulates all database operations for comments
- */
 export class CommentRepository {
   constructor(db) {
     this.db = db;

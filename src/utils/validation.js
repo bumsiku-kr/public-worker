@@ -1,8 +1,3 @@
-/**
- * Input Validation Utilities
- * Common validation functions for request data
- */
-
 import { ValidationError } from "./errors.js";
 
 /**

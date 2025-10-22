@@ -1,17 +1,7 @@
-/**
- * Post Service - Application Layer
- * Handles business logic and coordinates repository operations
- * Single Responsibility: Business rules and orchestration
- */
-
 import { NotFoundError, ValidationError } from "../utils/errors.js";
 import { validatePagination, validateSorting } from "../utils/validation.js";
 import { invalidatePostCache } from "../utils/cache.js";
 
-/**
- * Post Service
- * Implements business logic for post operations
- */
 export class PostService {
   constructor(postRepository, env) {
     this.postRepository = postRepository;
@@ -28,13 +18,11 @@ export class PostService {
    * @returns {Promise<Object>} Paginated response with posts
    */
   async getPosts({ tag = null, page = 0, size = 10, sort = "createdAt,desc" }) {
-    // Validate pagination parameters
     const paginationErrors = validatePagination({ page, size });
     if (paginationErrors.length > 0) {
       throw new ValidationError(paginationErrors.join(", "));
     }
 
-    // Validate and parse sorting
     const allowedSortFields = ["createdAt", "updatedAt", "views", "title"];
     const sortErrors = validateSorting(sort, allowedSortFields);
     if (sortErrors.length > 0) {
@@ -43,7 +31,6 @@ export class PostService {
 
     const [sortField, sortDirection] = sort.split(",");
 
-    // Map camelCase to snake_case for DB
     const fieldMapping = {
       createdAt: "created_at",
       updatedAt: "updated_at",
@@ -54,16 +41,13 @@ export class PostService {
     const dbSortField = fieldMapping[sortField] || sortField;
     const orderClause = `${dbSortField} ${sortDirection.toUpperCase()}`;
 
-    // Calculate offset
     const offset = page * size;
 
-    // Fetch posts and total count in parallel
     const [posts, totalElements] = await Promise.all([
       this.postRepository.findAll({ tag, offset, limit: size, orderClause }),
       this.postRepository.count(tag),
     ]);
 
-    // Enrich posts with tags (batch operation for efficiency)
     const postIds = posts.map((p) => p.id);
     const tagsByPost = await this.postRepository.getTagsForPosts(postIds);
 
@@ -78,7 +62,6 @@ export class PostService {
       views: post.views,
     }));
 
-    // Build paginated response
     return {
       content: postsWithTags,
       totalElements,
@@ -98,35 +81,29 @@ export class PostService {
       throw new ValidationError("Slug parameter is required");
     }
 
-    // Check if slug is numeric (ID)
     const isNumericId = /^\d+$/.test(slug);
 
     if (isNumericId) {
-      // Fetch by ID to get slug for redirect
       const post = await this.postRepository.findById(parseInt(slug, 10));
 
       if (!post) {
         throw new NotFoundError("Post not found");
       }
 
-      // Return redirect information
       return {
         redirect: true,
         slug: post.slug,
       };
     }
 
-    // Fetch by slug
     const post = await this.postRepository.findBySlug(slug);
 
     if (!post) {
       throw new NotFoundError("Post not found");
     }
 
-    // Fetch tags for this post
     const tags = await this.postRepository.getTagsForPost(post.id);
 
-    // Build response
     return {
       redirect: false,
       data: {
@@ -158,17 +135,14 @@ export class PostService {
       throw new ValidationError("Invalid post ID");
     }
 
-    // Increment views
     await this.postRepository.incrementViews(id);
 
-    // Fetch updated view count
     const views = await this.postRepository.getViews(id);
 
     if (views === null) {
       throw new NotFoundError("Post not found");
     }
 
-    // Invalidate cache for this post
     if (this.env.CACHE) {
       await invalidatePostCache(this.env.CACHE, id);
     }

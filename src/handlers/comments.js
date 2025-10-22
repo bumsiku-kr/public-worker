@@ -1,9 +1,3 @@
-/**
- * Public Worker - Comment Handlers
- * Handles HTTP requests for public comment endpoints
- * Single Responsibility: HTTP request/response handling only
- */
-
 import { jsonResponse, errorResponse } from "../utils/response.js";
 import { convertError } from "../utils/errors.js";
 import { createCommentRepository } from "../repositories/commentRepository.js";
@@ -17,14 +11,11 @@ export async function handleGetComments(_request, env, _ctx, params, _user) {
   try {
     const { postId } = params;
 
-    // Create service layer
     const commentRepository = createCommentRepository(env);
     const commentService = createCommentService(commentRepository, env);
 
-    // Delegate to service layer
     const data = await commentService.getCommentsByPostId(postId);
 
-    // Build success response
     const response = {
       success: true,
       data,
@@ -47,17 +38,13 @@ export async function handleCreateComment(request, env, _ctx, params, _user) {
   try {
     const { postId } = params;
 
-    // Parse request body
     const body = await request.json();
 
-    // Create service layer
     const commentRepository = createCommentRepository(env);
     const commentService = createCommentService(commentRepository, env);
 
-    // Delegate to service layer
     const data = await commentService.createComment(postId, body);
 
-    // Build success response
     const response = {
       success: true,
       data,

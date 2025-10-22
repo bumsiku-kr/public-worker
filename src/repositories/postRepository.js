@@ -1,13 +1,3 @@
-/**
- * Post Repository - Persistence Layer
- * Handles all database operations for posts
- * Single Responsibility: Data access only, no business logic
- */
-
-/**
- * Post Repository
- * Encapsulates all database operations for posts
- */
 export class PostRepository {
   constructor(db) {
     this.db = db;
@@ -32,7 +22,6 @@ export class PostRepository {
     let bindings;
 
     if (tag) {
-      // Filter by tag - join with post_tags and tags
       query = `
         SELECT DISTINCT p.id, p.slug, p.title, p.summary, p.created_at, p.updated_at, p.views
         FROM posts p
@@ -44,7 +33,6 @@ export class PostRepository {
       `;
       bindings = [tag, limit, offset];
     } else {
-      // No filter - get all published posts
       query = `
         SELECT id, slug, title, summary, created_at, updated_at, views
         FROM posts
@@ -201,7 +189,6 @@ export class PostRepository {
       .bind(...postIds)
       .all();
 
-    // Group tags by post_id
     const tagsByPost = new Map();
     for (const row of result.results) {
       if (!tagsByPost.has(row.post_id)) {

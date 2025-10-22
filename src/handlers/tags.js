@@ -1,9 +1,3 @@
-/**
- * Public Worker - Tag Handlers
- * Handles HTTP requests for public tag endpoints
- * Single Responsibility: HTTP request/response handling only
- */
-
 import { jsonResponse, errorResponse } from "../utils/response.js";
 import { convertError } from "../utils/errors.js";
 import { createTagRepository } from "../repositories/tagRepository.js";
@@ -15,14 +9,11 @@ import { createTagService } from "../services/tagService.js";
  */
 export async function handleGetTags(_request, env, _ctx, _params, _user) {
   try {
-    // Create service layer
     const tagRepository = createTagRepository(env);
     const tagService = createTagService(tagRepository);
 
-    // Delegate to service layer
     const data = await tagService.getActiveTags();
 
-    // Build success response
     const response = {
       success: true,
       data,

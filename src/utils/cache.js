@@ -1,9 +1,4 @@
 /**
- * Caching Utilities
- * KV-based caching for public API responses
- */
-
-/**
  * Generate a cache key from request details
  * @param {string} path - Request path
  * @param {Object} params - Query parameters
@@ -90,10 +85,7 @@ export async function invalidateCacheByPrefix(cache, prefix) {
   }
 
   try {
-    // List all keys with prefix
     const list = await cache.list({ prefix });
-
-    // Delete all matching keys
     const deletePromises = list.keys.map((key) => cache.delete(key.name));
     await Promise.all(deletePromises);
   } catch (error) {
@@ -110,24 +102,17 @@ export async function invalidateCacheByPrefix(cache, prefix) {
  * @returns {Promise<Object>} Data from cache or fetcher
  */
 export async function withCache(cache, key, dataFetcher, ttl = 3600) {
-  // Try to get from cache first
   const cached = await getCached(cache, key);
   if (cached) {
     return cached;
   }
 
-  // Fetch fresh data
   const data = await dataFetcher();
-
-  // Store in cache
   await setCached(cache, key, data, ttl);
 
   return data;
 }
 
-/**
- * Cache invalidation patterns for different operations
- */
 export const CacheInvalidationPatterns = {
   /**
    * Invalidate post-related caches when a post is created/updated/deleted
@@ -135,15 +120,12 @@ export const CacheInvalidationPatterns = {
    * @param {string} slug - Post slug (optional, for specific post)
    */
   async invalidatePostCaches(cache, slug = null) {
-    // Invalidate post list caches
     await invalidateCacheByPrefix(cache, "/posts");
 
-    // Invalidate specific post cache
     if (slug) {
       await invalidateCache(cache, `/posts/${slug}`);
     }
 
-    // Invalidate sitemap cache
     await invalidateCache(cache, "/sitemap");
   },
 
@@ -173,10 +155,7 @@ export const CacheInvalidationPatterns = {
 export async function invalidatePostCache(cache, postIdOrSlug) {
   if (!cache) return;
 
-  // Invalidate by ID pattern
   await invalidateCache(cache, `/posts/${postIdOrSlug}`);
-
-  // Also invalidate post lists
   await invalidateCacheByPrefix(cache, "/posts?");
 }
 

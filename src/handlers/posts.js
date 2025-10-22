@@ -1,9 +1,3 @@
-/**
- * Public Worker - Post Handlers
- * Handles HTTP requests for public post endpoints
- * Single Responsibility: HTTP request/response handling only
- */
-
 import { jsonResponse, errorResponse } from "../utils/response.js";
 import { convertError } from "../utils/errors.js";
 import { createPostRepository } from "../repositories/postRepository.js";
@@ -17,20 +11,16 @@ export async function handleGetPosts(request, env, _ctx, _params, _user) {
   try {
     const url = new URL(request.url);
 
-    // Extract query parameters
     const tag = url.searchParams.get("tag");
     const page = parseInt(url.searchParams.get("page") || "0", 10);
     const size = parseInt(url.searchParams.get("size") || "10", 10);
     const sort = url.searchParams.get("sort") || "createdAt,desc";
 
-    // Create service layer
     const postRepository = createPostRepository(env);
     const postService = createPostService(postRepository, env);
 
-    // Delegate to service layer
     const data = await postService.getPosts({ tag, page, size, sort });
 
-    // Build success response
     const response = {
       success: true,
       data,
@@ -54,14 +44,11 @@ export async function handleGetPostBySlug(request, env, _ctx, params, _user) {
   try {
     const { slug } = params;
 
-    // Create service layer
     const postRepository = createPostRepository(env);
     const postService = createPostService(postRepository, env);
 
-    // Delegate to service layer
     const result = await postService.getPostBySlug(slug);
 
-    // Handle redirect case
     if (result.redirect) {
       const url = new URL(request.url);
       const redirectUrl = `${url.origin}/posts/${result.slug}`;
@@ -74,7 +61,6 @@ export async function handleGetPostBySlug(request, env, _ctx, params, _user) {
       });
     }
 
-    // Build success response
     const response = {
       success: true,
       data: result.data,
@@ -97,14 +83,11 @@ export async function handleIncrementViews(_request, env, _ctx, params, _user) {
   try {
     const { postId } = params;
 
-    // Create service layer
     const postRepository = createPostRepository(env);
     const postService = createPostService(postRepository, env);
 
-    // Delegate to service layer
     const data = await postService.incrementPostViews(postId);
 
-    // Build success response
     const response = {
       success: true,
       data,
