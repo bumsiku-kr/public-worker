@@ -1,5 +1,5 @@
 import { jsonResponse, errorResponse } from "../utils/response.js";
-import { convertError } from "../utils/errors.js";
+import { toAPIError } from "../utils/errors.js";
 import { createTagRepository } from "../repositories/tagRepository.js";
 import { createSitemapService } from "../services/sitemapService.js";
 
@@ -23,7 +23,7 @@ export async function handleGetSitemap(_request, env, _ctx, _params, _user) {
     return jsonResponse(response, 200);
   } catch (error) {
     console.error("Error in handleGetSitemap:", error);
-    const apiError = convertError(error);
+    const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
   }
 }

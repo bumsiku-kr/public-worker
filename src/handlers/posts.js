@@ -1,5 +1,5 @@
 import { jsonResponse, errorResponse } from "../utils/response.js";
-import { convertError } from "../utils/errors.js";
+import { toAPIError } from "../utils/errors.js";
 import { createPostRepository } from "../repositories/postRepository.js";
 import { createPostService } from "../services/postService.js";
 
@@ -30,7 +30,7 @@ export async function handleGetPosts(request, env, _ctx, _params, _user) {
     return jsonResponse(response, 200);
   } catch (error) {
     console.error("Error in handleGetPosts:", error);
-    const apiError = convertError(error);
+    const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
   }
 }
@@ -70,7 +70,7 @@ export async function handleGetPostBySlug(request, env, _ctx, params, _user) {
     return jsonResponse(response, 200);
   } catch (error) {
     console.error("Error in handleGetPostBySlug:", error);
-    const apiError = convertError(error);
+    const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
   }
 }
@@ -97,7 +97,7 @@ export async function handleIncrementViews(_request, env, _ctx, params, _user) {
     return jsonResponse(response, 200);
   } catch (error) {
     console.error("Error in handleIncrementViews:", error);
-    const apiError = convertError(error);
+    const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
   }
 }

@@ -1,5 +1,5 @@
 import { errorResponse } from "./utils/response.js";
-import { convertError } from "./utils/errors.js";
+import { toAPIError } from "./utils/errors.js";
 import {
   handleGetPosts,
   handleGetPostBySlug,
@@ -133,7 +133,7 @@ export async function router(request, env, ctx) {
   } catch (error) {
     console.error("Router error:", error);
 
-    const apiError = convertError(error);
+    const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
   }
 }

@@ -1,5 +1,5 @@
 import { jsonResponse, errorResponse } from "../utils/response.js";
-import { convertError } from "../utils/errors.js";
+import { toAPIError } from "../utils/errors.js";
 import { createCommentRepository } from "../repositories/commentRepository.js";
 import { createCommentService } from "../services/commentService.js";
 
@@ -25,7 +25,7 @@ export async function handleGetComments(_request, env, _ctx, params, _user) {
     return jsonResponse(response, 200);
   } catch (error) {
     console.error("Error in handleGetComments:", error);
-    const apiError = convertError(error);
+    const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
   }
 }
@@ -54,7 +54,7 @@ export async function handleCreateComment(request, env, _ctx, params, _user) {
     return jsonResponse(response, 200);
   } catch (error) {
     console.error("Error in handleCreateComment:", error);
-    const apiError = convertError(error);
+    const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
   }
 }

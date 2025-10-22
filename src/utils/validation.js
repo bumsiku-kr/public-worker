@@ -218,3 +218,77 @@ export function validateSortParam(
 
   return { field, direction: direction.toLowerCase() };
 }
+
+/**
+ * Validate pagination parameters (returns array of errors)
+ * @param {Object} params - Pagination parameters
+ * @returns {Array<string>} Array of validation errors
+ */
+export function validatePagination(params) {
+  const errors = [];
+  const { page, size } = params;
+
+  if (page !== undefined) {
+    if (typeof page !== "number" || isNaN(page) || page < 0) {
+      errors.push("Page must be a non-negative integer");
+    }
+  }
+
+  if (size !== undefined) {
+    if (typeof size !== "number" || isNaN(size) || size < 1 || size > 100) {
+      errors.push("Size must be between 1 and 100");
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Validate sorting parameters (returns array of errors)
+ * @param {string} sort - Sort parameter
+ * @param {Array<string>} allowedFields - Allowed sort fields
+ * @returns {Array<string>} Array of validation errors
+ */
+export function validateSorting(sort, allowedFields) {
+  const errors = [];
+
+  if (!sort || typeof sort !== "string") {
+    errors.push("Sort parameter must be a string");
+    return errors;
+  }
+
+  const [field, direction = "desc"] = sort.split(",");
+
+  if (!allowedFields.includes(field)) {
+    errors.push(`Sort field must be one of: ${allowedFields.join(", ")}`);
+  }
+
+  if (!["asc", "desc"].includes(direction.toLowerCase())) {
+    errors.push('Sort direction must be "asc" or "desc"');
+  }
+
+  return errors;
+}
+
+/**
+ * Validate comment creation data (returns array of errors)
+ * @param {Object} data - Comment data
+ * @returns {Array<string>} Array of validation errors
+ */
+export function validateCreateComment(data) {
+  const errors = [];
+
+  if (!data.content || typeof data.content !== "string") {
+    errors.push("Content is required and must be a string");
+  } else if (data.content.trim().length < 1 || data.content.length > 500) {
+    errors.push("Content must be between 1 and 500 characters");
+  }
+
+  if (!data.author || typeof data.author !== "string") {
+    errors.push("Author is required and must be a string");
+  } else if (data.author.trim().length < 2 || data.author.length > 20) {
+    errors.push("Author must be between 2 and 20 characters");
+  }
+
+  return errors;
+}
