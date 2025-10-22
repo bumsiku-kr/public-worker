@@ -10,7 +10,7 @@ export class APIError extends Error {
   constructor(message, status = 400) {
     super(message);
     this.status = status;
-    this.name = 'APIError';
+    this.name = "APIError";
   }
 }
 
@@ -20,7 +20,7 @@ export class APIError extends Error {
 export class ValidationError extends APIError {
   constructor(message) {
     super(message, 400);
-    this.name = 'ValidationError';
+    this.name = "ValidationError";
   }
 }
 
@@ -28,9 +28,9 @@ export class ValidationError extends APIError {
  * Not Found Error - for missing resources
  */
 export class NotFoundError extends APIError {
-  constructor(message = 'Resource not found') {
+  constructor(message = "Resource not found") {
     super(message, 404);
-    this.name = 'NotFoundError';
+    this.name = "NotFoundError";
   }
 }
 
@@ -38,9 +38,9 @@ export class NotFoundError extends APIError {
  * Unauthorized Error - for authentication failures
  */
 export class UnauthorizedError extends APIError {
-  constructor(message = 'Unauthorized') {
+  constructor(message = "Unauthorized") {
     super(message, 401);
-    this.name = 'UnauthorizedError';
+    this.name = "UnauthorizedError";
   }
 }
 
@@ -48,9 +48,9 @@ export class UnauthorizedError extends APIError {
  * Forbidden Error - for authorization failures
  */
 export class ForbiddenError extends APIError {
-  constructor(message = 'Forbidden') {
+  constructor(message = "Forbidden") {
     super(message, 403);
-    this.name = 'ForbiddenError';
+    this.name = "ForbiddenError";
   }
 }
 
@@ -58,9 +58,9 @@ export class ForbiddenError extends APIError {
  * Conflict Error - for resource conflicts
  */
 export class ConflictError extends APIError {
-  constructor(message = 'Resource conflict') {
+  constructor(message = "Resource conflict") {
     super(message, 409);
-    this.name = 'ConflictError';
+    this.name = "ConflictError";
   }
 }
 
@@ -68,9 +68,9 @@ export class ConflictError extends APIError {
  * Internal Server Error - for unexpected server errors
  */
 export class InternalServerError extends APIError {
-  constructor(message = 'Internal server error') {
+  constructor(message = "Internal server error") {
     super(message, 500);
-    this.name = 'InternalServerError';
+    this.name = "InternalServerError";
   }
 }
 
@@ -85,26 +85,40 @@ export function toAPIError(error) {
   }
 
   // Map common error patterns to appropriate API errors
-  if (error.message.includes('not found')) {
+  if (error.message.includes("not found")) {
     return new NotFoundError(error.message);
   }
 
-  if (error.message.includes('unauthorized') || error.message.includes('authentication')) {
+  if (
+    error.message.includes("unauthorized") ||
+    error.message.includes("authentication")
+  ) {
     return new UnauthorizedError(error.message);
   }
 
-  if (error.message.includes('forbidden') || error.message.includes('permission')) {
+  if (
+    error.message.includes("forbidden") ||
+    error.message.includes("permission")
+  ) {
     return new ForbiddenError(error.message);
   }
 
-  if (error.message.includes('validation') || error.message.includes('invalid')) {
+  if (
+    error.message.includes("validation") ||
+    error.message.includes("invalid")
+  ) {
     return new ValidationError(error.message);
   }
 
-  if (error.message.includes('conflict') || error.message.includes('duplicate')) {
+  if (
+    error.message.includes("conflict") ||
+    error.message.includes("duplicate")
+  ) {
     return new ConflictError(error.message);
   }
 
   // Default to internal server error
-  return new InternalServerError(error.message || 'An unexpected error occurred');
+  return new InternalServerError(
+    error.message || "An unexpected error occurred",
+  );
 }

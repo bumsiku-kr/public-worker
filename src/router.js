@@ -3,14 +3,18 @@
  * URL routing logic for public API endpoints
  */
 
-import { errorResponse } from './utils/response.js';
-import { convertError } from './utils/errors.js';
+import { errorResponse } from "./utils/response.js";
+import { convertError } from "./utils/errors.js";
 
 // Import all handlers
-import { handleGetPosts, handleGetPostBySlug, handleIncrementViews } from './handlers/posts.js';
-import { handleGetComments, handleCreateComment } from './handlers/comments.js';
-import { handleGetTags } from './handlers/tags.js';
-import { handleGetSitemap } from './handlers/sitemap.js';
+import {
+  handleGetPosts,
+  handleGetPostBySlug,
+  handleIncrementViews,
+} from "./handlers/posts.js";
+import { handleGetComments, handleCreateComment } from "./handlers/comments.js";
+import { handleGetTags } from "./handlers/tags.js";
+import { handleGetSitemap } from "./handlers/sitemap.js";
 
 /**
  * Route configuration
@@ -19,19 +23,19 @@ import { handleGetSitemap } from './handlers/sitemap.js';
  */
 const routes = [
   // Public post endpoints
-  { pattern: 'GET /posts', handler: handleGetPosts },
-  { pattern: 'GET /posts/:slug', handler: handleGetPostBySlug },
-  { pattern: 'PATCH /posts/:postId/views', handler: handleIncrementViews },
+  { pattern: "GET /posts", handler: handleGetPosts },
+  { pattern: "GET /posts/:slug", handler: handleGetPostBySlug },
+  { pattern: "PATCH /posts/:postId/views", handler: handleIncrementViews },
 
   // Public comment endpoints
-  { pattern: 'GET /comments/:postId', handler: handleGetComments },
-  { pattern: 'POST /comments/:postId', handler: handleCreateComment },
+  { pattern: "GET /comments/:postId", handler: handleGetComments },
+  { pattern: "POST /comments/:postId", handler: handleCreateComment },
 
   // Public tag endpoints
-  { pattern: 'GET /tags', handler: handleGetTags },
+  { pattern: "GET /tags", handler: handleGetTags },
 
   // Public sitemap endpoint
-  { pattern: 'GET /sitemap', handler: handleGetSitemap },
+  { pattern: "GET /sitemap", handler: handleGetSitemap },
 ];
 
 /**
@@ -41,8 +45,8 @@ const routes = [
  * @returns {Object|null} Match result with params, or null if no match
  */
 function matchPattern(pattern, path) {
-  const patternParts = pattern.split('/').filter(Boolean);
-  const pathParts = path.split('/').filter(Boolean);
+  const patternParts = pattern.split("/").filter(Boolean);
+  const pathParts = path.split("/").filter(Boolean);
 
   // Must have same number of parts
   if (patternParts.length !== pathParts.length) {
@@ -56,7 +60,7 @@ function matchPattern(pattern, path) {
     const pathPart = pathParts[i];
 
     // Parameter (starts with :)
-    if (patternPart.startsWith(':')) {
+    if (patternPart.startsWith(":")) {
       const paramName = patternPart.substring(1);
       params[paramName] = decodeURIComponent(pathPart);
     }
@@ -77,7 +81,7 @@ function matchPattern(pattern, path) {
  */
 function findRoute(method, pathname) {
   for (const route of routes) {
-    const [routeMethod, routePattern] = route.pattern.split(' ', 2);
+    const [routeMethod, routePattern] = route.pattern.split(" ", 2);
 
     // Method must match
     if (routeMethod !== method) {
@@ -89,7 +93,7 @@ function findRoute(method, pathname) {
     if (match) {
       return {
         handler: route.handler,
-        params: match.params
+        params: match.params,
       };
     }
   }
@@ -107,7 +111,7 @@ async function parseJsonBody(request) {
     const text = await request.text();
     return text ? JSON.parse(text) : {};
   } catch (error) {
-    throw new Error('Invalid JSON in request body');
+    throw new Error("Invalid JSON in request body");
   }
 }
 
@@ -141,12 +145,12 @@ export async function router(request, env, ctx) {
     const match = findRoute(method, pathname);
 
     if (!match) {
-      return errorResponse('Not Found', 404);
+      return errorResponse("Not Found", 404);
     }
 
     // Parse request body for POST/PUT/PATCH
     let body = null;
-    if (['POST', 'PUT', 'PATCH'].includes(method)) {
+    if (["POST", "PUT", "PATCH"].includes(method)) {
       body = await parseJsonBody(request);
     }
 
@@ -156,9 +160,8 @@ export async function router(request, env, ctx) {
     // Call handler with parameters
     // Handler signature: handler(request, env, ctx, params, user)
     return await match.handler(request, env, ctx, match.params, null);
-
   } catch (error) {
-    console.error('Router error:', error);
+    console.error("Router error:", error);
 
     // Convert to API error
     const apiError = convertError(error);
@@ -180,5 +183,5 @@ export function registerRoute(pattern, handler) {
  * @returns {Array} Array of routes
  */
 export function getRoutes() {
-  return routes.map(r => r.pattern);
+  return routes.map((r) => r.pattern);
 }

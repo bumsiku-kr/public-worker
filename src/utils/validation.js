@@ -3,7 +3,7 @@
  * Common validation functions for request data
  */
 
-import { ValidationError } from './errors.js';
+import { ValidationError } from "./errors.js";
 
 /**
  * Validate required fields are present
@@ -12,13 +12,13 @@ import { ValidationError } from './errors.js';
  * @throws {ValidationError} If any required field is missing
  */
 export function validateRequired(data, requiredFields) {
-  const missing = requiredFields.filter(field => {
+  const missing = requiredFields.filter((field) => {
     const value = data[field];
-    return value === undefined || value === null || value === '';
+    return value === undefined || value === null || value === "";
   });
 
   if (missing.length > 0) {
-    throw new ValidationError(`Missing required fields: ${missing.join(', ')}`);
+    throw new ValidationError(`Missing required fields: ${missing.join(", ")}`);
   }
 }
 
@@ -31,14 +31,16 @@ export function validateRequired(data, requiredFields) {
  * @throws {ValidationError} If string length is invalid
  */
 export function validateStringLength(value, fieldName, min, max) {
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     throw new ValidationError(`${fieldName} must be a string`);
   }
 
   const length = value.trim().length;
 
   if (length < min) {
-    throw new ValidationError(`${fieldName} must be at least ${min} characters`);
+    throw new ValidationError(
+      `${fieldName} must be at least ${min} characters`,
+    );
   }
 
   if (length > max) {
@@ -56,7 +58,7 @@ export function validateSlug(slug) {
 
   if (!slugPattern.test(slug)) {
     throw new ValidationError(
-      'Slug must contain only lowercase letters, numbers, and hyphens (pattern: a-z0-9-)'
+      "Slug must contain only lowercase letters, numbers, and hyphens (pattern: a-z0-9-)",
     );
   }
 }
@@ -70,7 +72,7 @@ export function validateEmail(email) {
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailPattern.test(email)) {
-    throw new ValidationError('Invalid email format');
+    throw new ValidationError("Invalid email format");
   }
 }
 
@@ -84,7 +86,7 @@ export function validateEmail(email) {
 export function validateEnum(value, fieldName, allowedValues) {
   if (!allowedValues.includes(value)) {
     throw new ValidationError(
-      `${fieldName} must be one of: ${allowedValues.join(', ')}`
+      `${fieldName} must be one of: ${allowedValues.join(", ")}`,
     );
   }
 }
@@ -115,7 +117,7 @@ export function validateArray(value, fieldName, maxItems = null) {
  * @throws {ValidationError} If value is not in valid range
  */
 export function validateNumberRange(value, fieldName, min, max) {
-  if (typeof value !== 'number' || isNaN(value)) {
+  if (typeof value !== "number" || isNaN(value)) {
     throw new ValidationError(`${fieldName} must be a number`);
   }
 
@@ -130,22 +132,24 @@ export function validateNumberRange(value, fieldName, min, max) {
  * @throws {ValidationError} If validation fails
  */
 export function validatePostRequest(data) {
-  validateRequired(data, ['title', 'content', 'summary', 'state']);
+  validateRequired(data, ["title", "content", "summary", "state"]);
 
-  validateStringLength(data.title, 'title', 1, 100);
-  validateStringLength(data.content, 'content', 1, 10000);
-  validateStringLength(data.summary, 'summary', 1, 200);
-  validateEnum(data.state, 'state', ['published', 'draft']);
+  validateStringLength(data.title, "title", 1, 100);
+  validateStringLength(data.content, "content", 1, 10000);
+  validateStringLength(data.summary, "summary", 1, 200);
+  validateEnum(data.state, "state", ["published", "draft"]);
 
   if (data.slug) {
     validateSlug(data.slug);
   }
 
   if (data.tags) {
-    validateArray(data.tags, 'tags', 20);
+    validateArray(data.tags, "tags", 20);
     data.tags.forEach((tag, index) => {
-      if (typeof tag !== 'string' || tag.trim().length === 0) {
-        throw new ValidationError(`Tag at index ${index} must be a non-empty string`);
+      if (typeof tag !== "string" || tag.trim().length === 0) {
+        throw new ValidationError(
+          `Tag at index ${index} must be a non-empty string`,
+        );
       }
     });
   }
@@ -157,10 +161,10 @@ export function validatePostRequest(data) {
  * @throws {ValidationError} If validation fails
  */
 export function validateCommentRequest(data) {
-  validateRequired(data, ['content', 'author']);
+  validateRequired(data, ["content", "author"]);
 
-  validateStringLength(data.content, 'content', 1, 500);
-  validateStringLength(data.author, 'author', 2, 20);
+  validateStringLength(data.content, "content", 1, 500);
+  validateStringLength(data.author, "author", 2, 20);
 }
 
 /**
@@ -169,10 +173,10 @@ export function validateCommentRequest(data) {
  * @throws {ValidationError} If validation fails
  */
 export function validateLoginRequest(data) {
-  validateRequired(data, ['username', 'password']);
+  validateRequired(data, ["username", "password"]);
 
-  validateStringLength(data.username, 'username', 2, 50);
-  validateStringLength(data.password, 'password', 1, 100);
+  validateStringLength(data.username, "username", 2, 50);
+  validateStringLength(data.password, "password", 1, 100);
 }
 
 /**
@@ -181,15 +185,15 @@ export function validateLoginRequest(data) {
  * @returns {Object} Validated pagination params
  */
 export function validatePaginationParams(params) {
-  const page = parseInt(params.page || '0', 10);
-  const size = parseInt(params.size || '10', 10);
+  const page = parseInt(params.page || "0", 10);
+  const size = parseInt(params.size || "10", 10);
 
   if (isNaN(page) || page < 0) {
-    throw new ValidationError('Page must be a non-negative integer');
+    throw new ValidationError("Page must be a non-negative integer");
   }
 
   if (isNaN(size) || size < 1 || size > 100) {
-    throw new ValidationError('Size must be between 1 and 100');
+    throw new ValidationError("Size must be between 1 and 100");
   }
 
   return { page, size };
@@ -201,14 +205,19 @@ export function validatePaginationParams(params) {
  * @param {Array<string>} allowedFields - Allowed sort fields
  * @returns {Object} Validated sort params
  */
-export function validateSortParam(sort = 'createdAt,desc', allowedFields = ['createdAt', 'updatedAt', 'views', 'title']) {
-  const [field, direction = 'desc'] = sort.split(',');
+export function validateSortParam(
+  sort = "createdAt,desc",
+  allowedFields = ["createdAt", "updatedAt", "views", "title"],
+) {
+  const [field, direction = "desc"] = sort.split(",");
 
   if (!allowedFields.includes(field)) {
-    throw new ValidationError(`Sort field must be one of: ${allowedFields.join(', ')}`);
+    throw new ValidationError(
+      `Sort field must be one of: ${allowedFields.join(", ")}`,
+    );
   }
 
-  if (!['asc', 'desc'].includes(direction.toLowerCase())) {
+  if (!["asc", "desc"].includes(direction.toLowerCase())) {
     throw new ValidationError('Sort direction must be "asc" or "desc"');
   }
 

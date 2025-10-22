@@ -12,8 +12,8 @@
 export function generateCacheKey(path, params = {}) {
   const sortedParams = Object.keys(params)
     .sort()
-    .map(key => `${key}=${params[key]}`)
-    .join('&');
+    .map((key) => `${key}=${params[key]}`)
+    .join("&");
 
   return sortedParams ? `${path}?${sortedParams}` : path;
 }
@@ -30,10 +30,10 @@ export async function getCached(cache, key) {
   }
 
   try {
-    const cached = await cache.get(key, 'json');
+    const cached = await cache.get(key, "json");
     return cached;
   } catch (error) {
-    console.error('Cache read error:', error);
+    console.error("Cache read error:", error);
     return null;
   }
 }
@@ -53,10 +53,10 @@ export async function setCached(cache, key, data, ttl = 3600) {
 
   try {
     await cache.put(key, JSON.stringify(data), {
-      expirationTtl: ttl
+      expirationTtl: ttl,
     });
   } catch (error) {
-    console.error('Cache write error:', error);
+    console.error("Cache write error:", error);
   }
 }
 
@@ -74,7 +74,7 @@ export async function invalidateCache(cache, key) {
   try {
     await cache.delete(key);
   } catch (error) {
-    console.error('Cache invalidation error:', error);
+    console.error("Cache invalidation error:", error);
   }
 }
 
@@ -94,10 +94,10 @@ export async function invalidateCacheByPrefix(cache, prefix) {
     const list = await cache.list({ prefix });
 
     // Delete all matching keys
-    const deletePromises = list.keys.map(key => cache.delete(key.name));
+    const deletePromises = list.keys.map((key) => cache.delete(key.name));
     await Promise.all(deletePromises);
   } catch (error) {
-    console.error('Cache prefix invalidation error:', error);
+    console.error("Cache prefix invalidation error:", error);
   }
 }
 
@@ -136,7 +136,7 @@ export const CacheInvalidationPatterns = {
    */
   async invalidatePostCaches(cache, slug = null) {
     // Invalidate post list caches
-    await invalidateCacheByPrefix(cache, '/posts');
+    await invalidateCacheByPrefix(cache, "/posts");
 
     // Invalidate specific post cache
     if (slug) {
@@ -144,7 +144,7 @@ export const CacheInvalidationPatterns = {
     }
 
     // Invalidate sitemap cache
-    await invalidateCache(cache, '/sitemap');
+    await invalidateCache(cache, "/sitemap");
   },
 
   /**
@@ -161,8 +161,8 @@ export const CacheInvalidationPatterns = {
    * @param {KVNamespace} cache - KV namespace binding
    */
   async invalidateTagCaches(cache) {
-    await invalidateCache(cache, '/tags');
-  }
+    await invalidateCache(cache, "/tags");
+  },
 };
 
 /**
@@ -177,7 +177,7 @@ export async function invalidatePostCache(cache, postIdOrSlug) {
   await invalidateCache(cache, `/posts/${postIdOrSlug}`);
 
   // Also invalidate post lists
-  await invalidateCacheByPrefix(cache, '/posts?');
+  await invalidateCacheByPrefix(cache, "/posts?");
 }
 
 /**

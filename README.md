@@ -5,6 +5,7 @@ Public-facing CloudFlare Worker for read-only blog API operations.
 ## Overview
 
 This worker handles all public (non-authenticated) operations:
+
 - Post listing and retrieval
 - Comment reading and creation
 - Tag browsing
@@ -16,21 +17,25 @@ This worker handles all public (non-authenticated) operations:
 All endpoints are public and require no authentication:
 
 ### Post Endpoints
+
 - `GET /posts` - List posts with pagination, filtering, and sorting
 - `GET /posts/{slug}` - Get single post by slug or ID
 - `PATCH /posts/{postId}/views` - Increment post view count
 
 ### Comment Endpoints
+
 - `GET /comments/{postId}` - Get all comments for a post
 - `POST /comments/{postId}` - Create new comment (public submission)
 
 ### Utility Endpoints
+
 - `GET /tags` - List all tags with post counts
 - `GET /sitemap` - Generate sitemap for SEO
 
 ## Query Parameters
 
 ### GET /posts
+
 ```
 ?tag=javascript           # Filter by tag
 ?page=0                   # Page number (0-indexed)
@@ -41,6 +46,7 @@ All endpoints are public and require no authentication:
 ## Configuration
 
 ### Environment Variables (wrangler.toml)
+
 ```toml
 [vars]
 ENVIRONMENT = "production"
@@ -49,10 +55,12 @@ CACHE_TTL = "3600"  # 1 hour cache
 ```
 
 ### CloudFlare Bindings
+
 - `DB` - D1 database (blog-db, read-only access)
 - `CACHE` - KV namespace (optional, for caching)
 
 ### No Secrets Required
+
 Public worker operates in read-only mode with no authentication.
 
 ## Local Development
@@ -116,12 +124,14 @@ public-worker/
 ## Caching Strategy
 
 ### KV Cache (Optional)
+
 - Post listings: 1 hour TTL
 - Individual posts: 1 hour TTL
 - Tag listings: 1 hour TTL
 - Cache invalidation on post updates (via admin worker)
 
 ### CloudFlare Edge Cache
+
 - Static responses cached at edge locations
 - Cache-Control headers for browser caching
 
@@ -160,6 +170,7 @@ All successful responses follow standard format:
 ```
 
 ### Paginated Response
+
 ```json
 {
   "success": true,
@@ -176,6 +187,7 @@ All successful responses follow standard format:
 ## Input Validation
 
 ### Comment Creation
+
 - `content`: 1-500 characters, required
 - `author`: 2-20 characters, required
 - Basic XSS protection and sanitization
@@ -183,6 +195,7 @@ All successful responses follow standard format:
 ## CORS Configuration
 
 Configured to allow requests from:
+
 - `https://bumsiku.kr` (production)
 - `http://localhost:*` (development)
 
@@ -206,7 +219,9 @@ Configured to allow requests from:
 ## SEO Considerations
 
 ### Sitemap Endpoint
+
 The `/sitemap` endpoint returns all post slugs for SEO tools:
+
 ```json
 {
   "success": true,
