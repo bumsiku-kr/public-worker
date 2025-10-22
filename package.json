@@ -1,0 +1,27 @@
+{
+  "name": "public-worker",
+  "version": "1.0.0",
+  "description": "CloudFlare Worker for bumsiku.kr public API without authentication",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "blog",
+    "api",
+    "public"
+  ],
+  "author": "bumsiku.kr",
+  "license": "MIT",
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "vitest": "^1.0.0"
+  }
+}

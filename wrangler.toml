@@ -1,0 +1,23 @@
+name = "public-worker"
+main = "src/index.js"
+compatibility_date = "2024-10-22"
+node_compat = false
+
+# Environment Variables
+[vars]
+ENVIRONMENT = "production"
+ALLOWED_ORIGINS = "https://bumsiku.kr"
+CACHE_TTL = "3600"  # 1 hour
+
+# D1 Database - Admin Worker와 동일한 데이터베이스 공유
+[[d1_databases]]
+binding = "DB"
+database_name = "blog-db"
+database_id = "YOUR_D1_DATABASE_ID"  # TODO: Admin Worker와 동일한 ID 사용
+
+# KV Namespace (선택) - 읽기 전용 캐싱
+[[kv_namespaces]]
+binding = "CACHE"
+id = "YOUR_KV_NAMESPACE_ID"  # TODO: Admin Worker와 동일한 ID 사용
+
+# Public Worker는 secrets 불필요 (읽기 전용)
