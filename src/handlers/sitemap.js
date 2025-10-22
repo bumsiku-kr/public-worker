@@ -1,33 +1,31 @@
 /**
  * Public Worker - Sitemap Handler
- * Generates sitemap for SEO
+ * Handles HTTP requests for sitemap generation
+ * Single Responsibility: HTTP request/response handling only
  */
 
 import { jsonResponse, errorResponse } from "../utils/response.js";
 import { convertError } from "../utils/errors.js";
+import { createTagRepository } from "../repositories/tagRepository.js";
+import { createSitemapService } from "../services/sitemapService.js";
 
 /**
  * GET /sitemap
  * Generate sitemap with all published post slugs for SEO
  */
-export async function handleGetSitemap(request, env, ctx, params, user) {
+export async function handleGetSitemap(_request, env, _ctx, _params, _user) {
   try {
-    // Fetch all published post slugs
-    const result = await env.DB.prepare(
-      `
-      SELECT slug
-      FROM posts
-      WHERE state = 'published'
-      ORDER BY created_at DESC
-    `,
-    ).all();
+    // Create service layer
+    const tagRepository = createTagRepository(env);
+    const sitemapService = createSitemapService(tagRepository);
 
-    // Extract slugs as simple array
-    const slugs = result.results.map((post) => post.slug);
+    // Delegate to service layer
+    const data = await sitemapService.generateSitemap();
 
+    // Build success response
     const response = {
       success: true,
-      data: slugs,
+      data,
       error: null,
     };
 

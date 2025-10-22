@@ -1,39 +1,31 @@
 /**
  * Public Worker - Tag Handlers
- * Handles public tag operations
+ * Handles HTTP requests for public tag endpoints
+ * Single Responsibility: HTTP request/response handling only
  */
 
 import { jsonResponse, errorResponse } from "../utils/response.js";
 import { convertError } from "../utils/errors.js";
+import { createTagRepository } from "../repositories/tagRepository.js";
+import { createTagService } from "../services/tagService.js";
 
 /**
  * GET /tags
  * Retrieve all active tags with post counts
  */
-export async function handleGetTags(request, env, ctx, params, user) {
+export async function handleGetTags(_request, env, _ctx, _params, _user) {
   try {
-    // Fetch all tags with post counts
-    // The post_count is automatically maintained by database triggers
-    const result = await env.DB.prepare(
-      `
-      SELECT id, name, created_at, post_count
-      FROM tags
-      WHERE post_count > 0
-      ORDER BY name ASC
-    `,
-    ).all();
+    // Create service layer
+    const tagRepository = createTagRepository(env);
+    const tagService = createTagService(tagRepository);
 
-    // Format response
-    const tags = result.results.map((tag) => ({
-      id: tag.id,
-      name: tag.name,
-      postCount: tag.post_count,
-      createdAt: tag.created_at,
-    }));
+    // Delegate to service layer
+    const data = await tagService.getActiveTags();
 
+    // Build success response
     const response = {
       success: true,
-      data: tags,
+      data,
       error: null,
     };
 
