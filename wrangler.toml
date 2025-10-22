@@ -1,3 +1,10 @@
 name = "public-worker"
 main = "src/index.js"
 compatibility_date = "2025-10-22"
+
+# Note: D1 Database and KV bindings should be configured in Cloudflare dashboard
+# or via environment-specific wrangler configuration
+
+# Environment variables
+[vars]
+ALLOWED_ORIGINS = "*"
