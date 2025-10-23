@@ -30,7 +30,19 @@ export async function handleGetPosts(
       type: "handler",
       handler: "handleGetPosts",
       params: { tag, page, size, sort },
+      envKeys: Object.keys(env || {}),
+      hasDB: !!env?.DB,
     });
+
+    if (!env || !env.DB) {
+      logger.error("Database binding not found", {
+        type: "handler",
+        handler: "handleGetPosts",
+        env: env ? "exists but no DB" : "env is undefined",
+        envKeys: env ? Object.keys(env) : [],
+      });
+      throw new Error("Database binding (DB) not configured");
+    }
 
     const tracker = createPerformanceTracker(logger, "getPosts");
     const postRepository = createPostRepository(env);
