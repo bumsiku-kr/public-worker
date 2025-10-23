@@ -8,6 +8,11 @@ binding = "DB"
 database_name = "blog"
 database_id = "1da591ba-005a-41ef-86dd-f8755b06092d"
 
+# KV Namespace Bindings
+[[kv_namespaces]]
+binding = "KV"
+id = "3ed6c618f391422eb4ab3e2be270c156"
+
 # Environment variables
 [vars]
 ALLOWED_ORIGINS = "*"
