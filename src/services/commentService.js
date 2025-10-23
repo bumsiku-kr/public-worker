@@ -1,6 +1,5 @@
 import { ValidationError, NotFoundError } from "../utils/errors.js";
 import { validateCreateComment } from "../utils/validation.js";
-import { invalidateCommentCache } from "../utils/cache.js";
 
 export class CommentService {
   constructor(commentRepository, env) {
@@ -77,10 +76,6 @@ export class CommentService {
       createdAt: now,
       postId: id,
     });
-
-    if (this.env.CACHE) {
-      await invalidateCommentCache(this.env.CACHE, id);
-    }
 
     return {
       id: commentId,

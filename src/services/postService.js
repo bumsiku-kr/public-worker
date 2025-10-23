@@ -1,6 +1,5 @@
 import { NotFoundError, ValidationError } from "../utils/errors.js";
 import { validatePagination, validateSorting } from "../utils/validation.js";
-import { invalidatePostCache } from "../utils/cache.js";
 
 export class PostService {
   constructor(postRepository, env) {
@@ -141,10 +140,6 @@ export class PostService {
 
     if (views === null) {
       throw new NotFoundError("Post not found");
-    }
-
-    if (this.env.CACHE) {
-      await invalidatePostCache(this.env.CACHE, id);
     }
 
     return { views };
