@@ -23,11 +23,15 @@ export class PostRepository {
 
     if (tag) {
       query = `
-        SELECT DISTINCT p.id, p.slug, p.title, p.summary, p.created_at, p.updated_at, p.views
+        SELECT p.id, p.slug, p.title, p.summary, p.created_at, p.updated_at, p.views
         FROM posts p
-        INNER JOIN post_tags pt ON p.id = pt.post_id
-        INNER JOIN tags t ON pt.tag_id = t.id
-        WHERE t.name = ? AND p.state = 'published'
+        WHERE p.state = 'published'
+          AND p.id IN (
+            SELECT DISTINCT pt.post_id
+            FROM post_tags pt
+            INNER JOIN tags t ON pt.tag_id = t.id
+            WHERE t.name = ?
+          )
         ORDER BY ${orderClause}
         LIMIT ? OFFSET ?
       `;
