@@ -1,5 +1,6 @@
 import { errorResponse } from "./utils/response.js";
 import { toAPIError } from "./utils/errors.js";
+import { createLogger } from "./utils/logger.js";
 import {
   handleGetPosts,
   handleGetPostBySlug,
@@ -108,9 +109,12 @@ function getQueryParams(url) {
  * @param {Request} request - Request object
  * @param {Object} env - Environment bindings
  * @param {Object} ctx - Execution context
+ * @param {string} requestId - Request correlation ID
  * @returns {Promise<Response>} Response object
  */
-export async function router(request, env, ctx) {
+export async function router(request, env, ctx, requestId) {
+  const logger = createLogger(requestId);
+
   try {
     const url = new URL(request.url);
     const { pathname } = url;
@@ -119,19 +123,56 @@ export async function router(request, env, ctx) {
     const match = findRoute(method, pathname);
 
     if (!match) {
+      logger.warn("Route not found", {
+        type: "routing",
+        method,
+        pathname,
+      });
       return errorResponse("Not Found", 404);
     }
+
+    // Log route match
+    logger.debug("Route matched", {
+      type: "routing",
+      route: `${method} ${pathname}`,
+      params: match.params,
+    });
 
     let body = null;
     if (["POST", "PUT", "PATCH"].includes(method)) {
       body = await parseJsonBody(request);
+      logger.debug("Request body parsed", {
+        type: "routing",
+        bodySize: JSON.stringify(body).length,
+      });
     }
 
     const query = getQueryParams(url);
 
-    return await match.handler(request, env, ctx, match.params, null);
+    // Pass requestId to handler for consistent logging
+    const handlerStartTime = Date.now();
+    const response = await match.handler(request, env, ctx, match.params, null, requestId);
+    const handlerDuration = Date.now() - handlerStartTime;
+
+    logger.debug("Handler completed", {
+      type: "routing",
+      handler: match.handler.name,
+      performance: {
+        duration: `${handlerDuration}ms`,
+        durationMs: handlerDuration,
+      },
+    });
+
+    return response;
   } catch (error) {
-    console.error("Router error:", error);
+    logger.error("Router error", {
+      type: "routing",
+      error: {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+      },
+    });
 
     const apiError = toAPIError(error);
     return errorResponse(apiError.message, apiError.status);
