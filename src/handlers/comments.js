@@ -74,15 +74,13 @@ export async function handleCreateComment(
   env,
   _ctx,
   params,
-  _user,
+  body,
   requestId,
 ) {
   const logger = createLogger(requestId);
 
   try {
     const { postId } = params;
-
-    const body = await request.json();
 
     logger.debug("Creating comment", {
       type: "handler",

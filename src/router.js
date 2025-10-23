@@ -151,7 +151,7 @@ export async function router(request, env, ctx, requestId) {
 
     // Pass requestId to handler for consistent logging
     const handlerStartTime = Date.now();
-    const response = await match.handler(request, env, ctx, match.params, null, requestId);
+    const response = await match.handler(request, env, ctx, match.params, body, requestId);
     const handlerDuration = Date.now() - handlerStartTime;
 
     logger.debug("Handler completed", {
