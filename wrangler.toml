@@ -2,6 +2,12 @@ name = "public-worker"
 main = "src/index.js"
 compatibility_date = "2025-10-22"
 
+# D1 Database Bindings
+[[d1_databases]]
+binding = "DB"
+database_name = "blog"
+database_id = "1da591ba-005a-41ef-86dd-f8755b06092d"
+
 # Environment variables
 [vars]
 ALLOWED_ORIGINS = "*"
